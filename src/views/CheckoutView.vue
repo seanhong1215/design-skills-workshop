@@ -1,15 +1,13 @@
 <template>
   <main class="checkout">
     <div class="checkout__inner">
-      <div class="checkout__steps">
-        <div class="checkout__step checkout__step--done">
-          <span class="checkout__step-dot">✓</span>購物車
-        </div>
-        <div class="checkout__step checkout__step--active">
-          <span class="checkout__step-dot">2</span>填寫資料
-        </div>
-        <div class="checkout__step">
-          <span class="checkout__step-dot">3</span>付款成功
+      <div class="checkout__header">
+        <div class="checkout__steps">
+          <span class="checkout__step checkout__step--done">● 訂購中</span>
+          <span class="checkout__step-sep">—</span>
+          <span class="checkout__step checkout__step--active">● 填寫</span>
+          <span class="checkout__step-sep">—</span>
+          <span class="checkout__step">○ 完成</span>
         </div>
       </div>
 
@@ -79,48 +77,37 @@ async function handleSubmit() {
   padding: var(--space-8) var(--space-6);
 }
 
+.checkout__header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+}
+
 .checkout__steps {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
-  font-size: var(--text-sm);
+  gap: var(--space-2);
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
 .checkout__step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.checkout__step-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-border-default);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: var(--text-xs);
-  font-weight: 700;
 }
 
-.checkout__step--done .checkout__step-dot {
-  background-color: var(--color-status-success);
-  border-color: var(--color-status-success);
-  color: #fff;
+.checkout__step-sep {
+  color: var(--color-border-default);
+  font-size: var(--text-xs);
+}
+
+.checkout__step--done {
+  color: var(--color-status-success);
+  font-weight: 600;
 }
 
 .checkout__step--active {
   color: var(--color-accent-primary);
-  font-weight: 600;
-}
-
-.checkout__step--active .checkout__step-dot {
-  background-color: var(--color-accent-primary);
-  border-color: var(--color-accent-primary);
-  color: #fff;
+  font-weight: 700;
 }
 
 .checkout__content {

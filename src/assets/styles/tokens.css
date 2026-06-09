@@ -16,13 +16,13 @@
   --neutral-800: #1e293b;
   --neutral-900: #0f172a;
 
-  /* ---- Primitive: Accent (Blue) ---- */
-  --accent-50:  #eff6ff;
-  --accent-100: #dbeafe;
-  --accent-400: #60a5fa;
-  --accent-500: #3b82f6;
-  --accent-600: #2563eb;
-  --accent-700: #1d4ed8;
+  /* ---- Primitive: Accent (Steel Blue / Carbon Frost) ---- */
+  --accent-50:  #eef6fb;
+  --accent-100: #d0e9f5;
+  --accent-400: #7bbfe6;
+  --accent-500: #5aafde;
+  --accent-600: #4A9FD8;
+  --accent-700: #3a8fc8;
 
   /* ---- Semantic: Backgrounds ---- */
   --color-bg-base:    var(--neutral-50);
@@ -54,7 +54,7 @@
   /* ---- E-Commerce: Promo & Price ---- */
   --color-promo:          #e85d04;
   --color-promo-subtle:   #fff3e0;
-  --color-price:          #1a56db;
+  --color-price:          #4A9FD8;
   --color-price-original: var(--neutral-400);
   --color-rating:         #f59e0b;
 

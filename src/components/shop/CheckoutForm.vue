@@ -4,29 +4,31 @@
 
     <section class="checkout-form__section">
       <h3 class="checkout-form__section-title">收件人資訊</h3>
-      <div class="checkout-form__field">
-        <label class="checkout-form__label" for="cf-name">姓名 *</label>
-        <input
-          id="cf-name"
-          v-model="form.name"
-          class="checkout-form__input"
-          :class="{ 'checkout-form__input--error': errors.name }"
-          type="text"
-          placeholder="請輸入真實姓名"
-        />
-        <p v-if="errors.name" class="checkout-form__error">{{ errors.name }}</p>
-      </div>
-      <div class="checkout-form__field">
-        <label class="checkout-form__label" for="cf-phone">電話 *</label>
-        <input
-          id="cf-phone"
-          v-model="form.phone"
-          class="checkout-form__input"
-          :class="{ 'checkout-form__input--error': errors.phone }"
-          type="tel"
-          placeholder="0912-345-678"
-        />
-        <p v-if="errors.phone" class="checkout-form__error">{{ errors.phone }}</p>
+      <div class="checkout-form__row">
+        <div class="checkout-form__field">
+          <label class="checkout-form__label" for="cf-name">姓名 *</label>
+          <input
+            id="cf-name"
+            v-model="form.name"
+            class="checkout-form__input"
+            :class="{ 'checkout-form__input--error': errors.name }"
+            type="text"
+            placeholder="王小明"
+          />
+          <p v-if="errors.name" class="checkout-form__error">{{ errors.name }}</p>
+        </div>
+        <div class="checkout-form__field">
+          <label class="checkout-form__label" for="cf-phone">電話 *</label>
+          <input
+            id="cf-phone"
+            v-model="form.phone"
+            class="checkout-form__input"
+            :class="{ 'checkout-form__input--error': errors.phone }"
+            type="tel"
+            placeholder="0912-345-678"
+          />
+          <p v-if="errors.phone" class="checkout-form__error">{{ errors.phone }}</p>
+        </div>
       </div>
       <div class="checkout-form__field">
         <label class="checkout-form__label" for="cf-address">地址 *</label>
@@ -88,6 +90,13 @@ defineProps({
   margin: 0 0 var(--space-4);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border-default);
+}
+
+.checkout-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .checkout-form__field {

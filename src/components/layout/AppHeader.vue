@@ -9,14 +9,8 @@
         <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }">商品</RouterLink>
       </nav>
       <div class="header__actions">
-        <RouterLink :to="{ name: ROUTE_NAMES.CART }" class="header__cart">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
-          <span v-if="cartStore.itemCount > 0" class="header__cart-badge">
-            {{ cartStore.itemCount > 99 ? '99+' : cartStore.itemCount }}
-          </span>
+        <RouterLink :to="{ name: ROUTE_NAMES.CART }" class="header__cart-btn">
+          購物車{{ cartStore.itemCount > 0 ? ` (${cartStore.itemCount})` : '' }}
         </RouterLink>
       </div>
     </div>
@@ -55,6 +49,7 @@ const cartStore = useCartStore()
   font-size: var(--text-lg);
   color: var(--color-text-primary);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .header__nav {
@@ -78,39 +73,23 @@ const cartStore = useCartStore()
 .header__actions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
 }
 
-.header__cart {
-  position: relative;
-  display: flex;
+.header__cart-btn {
+  display: inline-flex;
   align-items: center;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  transition: color var(--transition-fast);
-}
-
-.header__cart:hover {
-  color: var(--color-accent-primary);
-}
-
-.header__cart-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background-color: var(--color-badge-bg);
-  color: var(--color-badge-text);
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
+  padding: var(--space-2) var(--space-5);
+  background-color: var(--color-accent-primary);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 600;
   border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.header__cart-btn:hover {
+  background-color: var(--color-accent-hover);
 }
 </style>

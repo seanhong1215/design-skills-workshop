@@ -35,7 +35,8 @@ const routes = [
   {
     path: '/checkout/success',
     name: ROUTE_NAMES.PAYMENT_SUCCESS,
-    component: () => import('@/views/PaymentSuccessView.vue')
+    component: () => import('@/views/PaymentSuccessView.vue'),
+    meta: { hideHeader: true }
   },
   {
     path: '/:pathMatch(.*)*',

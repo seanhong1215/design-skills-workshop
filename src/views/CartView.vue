@@ -3,9 +3,9 @@
     <div class="cart__inner">
       <div class="cart__header">
         <h1 class="cart__title">購物車</h1>
-        <button v-if="cartStore.cartItems.length > 0" class="cart__clear-btn" @click="cartStore.clearCart()">
-          清空購物車
-        </button>
+        <RouterLink v-if="cartStore.cartItems.length > 0" :to="{ name: ROUTE_NAMES.CHECKOUT }" class="cart__instant-checkout">
+          立即結帳
+        </RouterLink>
       </div>
 
       <div v-if="cartStore.cartItems.length > 0" class="cart__content">
@@ -94,12 +94,14 @@ const cartStore = useCartStore()
   margin: 0;
 }
 
-.cart__clear-btn {
+.cart__instant-checkout {
   font-size: var(--text-sm);
-  color: var(--color-status-error);
-  background: none;
-  border: none;
-  cursor: pointer;
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cart__instant-checkout:hover {
   text-decoration: underline;
 }
 

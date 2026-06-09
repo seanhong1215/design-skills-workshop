@@ -18,7 +18,7 @@
           NT${{ product.originalPrice.toLocaleString() }}
         </span>
       </div>
-      <button class="product-card__btn" @click.stop="$emit('add-to-cart', product)">
+      <button v-if="showCartBtn" class="product-card__btn" @click.stop="$emit('add-to-cart', product)">
         加入購物車
       </button>
     </div>
@@ -29,7 +29,8 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  product: { type: Object, required: true }
+  product: { type: Object, required: true },
+  showCartBtn: { type: Boolean, default: true }
 })
 
 defineEmits(['click', 'add-to-cart'])

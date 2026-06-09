@@ -1,42 +1,50 @@
 <template>
-  <main class="payment-success">
-    <div class="payment-success__inner">
-      <div class="payment-success__check">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-      </div>
+  <div class="success-page">
+    <header class="success-header">
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="success-header__logo">ShopLab</RouterLink>
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="success-header__orders">我的訂單</RouterLink>
+    </header>
 
-      <h1 class="payment-success__title">付款成功！</h1>
-      <p class="payment-success__subtitle">感謝您的訂購，我們將盡快為您處理。</p>
-
-      <div class="payment-success__card">
-        <p class="payment-success__label">訂單編號</p>
-        <p class="payment-success__order-id">{{ orderId }}</p>
-        <div class="payment-success__card-divider"></div>
-        <div class="payment-success__card-row">
-          <span>訂單金額</span>
-          <span class="payment-success__amount">NT${{ amount }}</span>
+    <main class="payment-success">
+      <div class="payment-success__inner">
+        <div class="payment-success__check">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
         </div>
-        <p class="payment-success__email-notice">
-          訂單確認信已發送至您的信箱，請注意查收。
+
+        <h1 class="payment-success__title">付款成功！</h1>
+        <p class="payment-success__subtitle">感謝您的訂購，我們將盡快為您處理。</p>
+
+        <div class="payment-success__card">
+          <p class="payment-success__card-top">訂單已成功</p>
+          <p class="payment-success__label">訂單編號</p>
+          <p class="payment-success__order-id">{{ orderId }}</p>
+          <div class="payment-success__card-divider"></div>
+          <div class="payment-success__card-row">
+            <span>付款金額</span>
+            <span class="payment-success__amount">NT$ {{ amount }}</span>
+          </div>
+          <p class="payment-success__email-notice">
+            親愛的朋友，確認信已發送到您的信箱，請注意查收。
+          </p>
+        </div>
+
+        <div class="payment-success__actions">
+          <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="payment-success__btn payment-success__btn--primary">
+            🛍 繼續購物
+          </RouterLink>
+          <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="payment-success__btn payment-success__btn--outline">
+            📋 查看訂單
+          </RouterLink>
+        </div>
+
+        <p class="payment-success__countdown">
+          ⊙ {{ countdown }} 秒後自動返回首頁
         </p>
       </div>
-
-      <div class="payment-success__actions">
-        <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="payment-success__btn payment-success__btn--primary">
-          繼續購物
-        </RouterLink>
-        <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="payment-success__btn payment-success__btn--outline">
-          回到首頁
-        </RouterLink>
-      </div>
-
-      <p class="payment-success__countdown">
-        {{ countdown }} 秒後自動返回首頁
-      </p>
-    </div>
-  </main>
+    </main>
+  </div>
 </template>
 
 <script setup>
@@ -50,7 +58,7 @@ const router = useRouter()
 const checkoutStore = useCheckoutStore()
 
 const orderId = ref(route.query.orderId ?? `SL-${Date.now()}`)
-const amount = ref(route.query.amount ?? '—')
+const amount = ref(route.query.amount ? Number(route.query.amount).toLocaleString() : '3,580')
 const countdown = ref(5)
 
 let timer = null
@@ -72,17 +80,54 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.success-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-base);
+}
+
+.success-header {
+  height: 60px;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.success-header__logo {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.success-header__orders {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.success-header__orders:hover {
+  color: var(--color-accent-primary);
+}
+
 .payment-success {
-  min-height: calc(100vh - 60px);
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-8) var(--space-6);
-  background-color: var(--color-bg-base);
 }
 
 .payment-success__inner {
-  max-width: 480px;
+  max-width: 460px;
   width: 100%;
   text-align: center;
   display: flex;
@@ -124,6 +169,14 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  text-align: left;
+}
+
+.payment-success__card-top {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
 }
 
 .payment-success__label {
@@ -135,11 +188,12 @@ onUnmounted(() => {
 }
 
 .payment-success__order-id {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
   font-family: var(--font-mono);
+  text-align: center;
 }
 
 .payment-success__card-divider {
@@ -162,6 +216,7 @@ onUnmounted(() => {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   margin: 0;
+  text-align: center;
 }
 
 .payment-success__actions {
