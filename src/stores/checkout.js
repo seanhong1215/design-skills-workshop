@@ -26,6 +26,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
     return Object.keys(e).length === 0
   }
 
+  function setOrderStatus(status) {
+    orderStatus.value = status
+  }
+
   async function submitOrder() {
     if (!validate()) return false
 
@@ -46,5 +50,5 @@ export const useCheckoutStore = defineStore('checkout', () => {
     errors.value = {}
   }
 
-  return { form, orderStatus, orderId, errors, submitOrder, resetOrder }
+  return { form, orderStatus, orderId, errors, validate, setOrderStatus, submitOrder, resetOrder }
 })

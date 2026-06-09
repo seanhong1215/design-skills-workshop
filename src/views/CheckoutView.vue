@@ -66,22 +66,31 @@
 </template>
 
 <script setup>
-import { useRouter, RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { Lock, ChevronRight, Loader2 } from 'lucide-vue-next'
 import { useCartStore } from '@/stores/cart.js'
 import { useCheckoutStore } from '@/stores/checkout.js'
+import { useNotificationStore } from '@/stores/notification.js'
 import { ROUTE_NAMES } from '@/constants/routes.js'
 import CheckoutForm from '@/components/shop/CheckoutForm.vue'
+import { createEcpayOrder, submitEcpayForm } from '@/services/ecpay.js'
 
-const router = useRouter()
 const cartStore = useCartStore()
 const checkoutStore = useCheckoutStore()
+const notificationStore = useNotificationStore()
 
 async function handleSubmit() {
-  const success = await checkoutStore.submitOrder()
-  if (success) {
+  if (!checkoutStore.validate()) return
+
+  checkoutStore.setOrderStatus('submitting')
+
+  try {
+    const { aioUrl, params } = await createEcpayOrder(cartStore.cartItems, cartStore.total)
     cartStore.clearCart()
-    router.push({ name: ROUTE_NAMES.PAYMENT_SUCCESS, query: { orderId: checkoutStore.orderId } })
+    submitEcpayForm(aioUrl, params)
+  } catch {
+    checkoutStore.setOrderStatus('idle')
+    notificationStore.error('建立訂單失敗，請重試')
   }
 }
 </script>

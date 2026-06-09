@@ -50,6 +50,12 @@ const routes = [
     meta: { hideHeader: true }
   },
   {
+    path: '/payment/result',
+    name: ROUTE_NAMES.PAYMENT_RESULT,
+    component: () => import('@/views/PaymentResultView.vue'),
+    meta: { hideHeader: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: ROUTE_NAMES.NOT_FOUND,
     component: () => import('@/views/NotFoundView.vue')

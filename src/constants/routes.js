@@ -8,5 +8,6 @@ export const ROUTE_NAMES = {
   PRODUCT_DETAIL: 'product-detail',
   CART: 'cart',
   CHECKOUT: 'checkout',
-  PAYMENT_SUCCESS: 'payment-success'
+  PAYMENT_SUCCESS: 'payment-success',
+  PAYMENT_RESULT: 'payment-result'
 }
