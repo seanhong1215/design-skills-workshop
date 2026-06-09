@@ -1,0 +1,119 @@
+/* ============================================================
+   Design Tokens — DesignSkill
+   架構：Primitive → Semantic → [data-theme="dark"] 覆寫
+   ============================================================ */
+
+:root {
+  /* ---- Primitive: Neutral Scale ---- */
+  --neutral-50:  #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+
+  /* ---- Primitive: Accent (Blue) ---- */
+  --accent-50:  #eff6ff;
+  --accent-100: #dbeafe;
+  --accent-400: #60a5fa;
+  --accent-500: #3b82f6;
+  --accent-600: #2563eb;
+  --accent-700: #1d4ed8;
+
+  /* ---- Semantic: Backgrounds ---- */
+  --color-bg-base:    var(--neutral-50);
+  --color-bg-surface: #ffffff;
+  --color-bg-overlay: #ffffff;
+  --color-bg-subtle:  var(--neutral-100);
+
+  /* ---- Semantic: Text ---- */
+  --color-text-primary:   var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-muted:     var(--neutral-400);
+  --color-text-inverse:   #ffffff;
+
+  /* ---- Semantic: Borders ---- */
+  --color-border-default: var(--neutral-200);
+  --color-border-strong:  var(--neutral-300);
+
+  /* ---- Semantic: Accent ---- */
+  --color-accent-primary:   var(--accent-600);
+  --color-accent-hover:     var(--accent-700);
+  --color-accent-subtle:    var(--accent-100);
+
+  /* ---- Semantic: Status ---- */
+  --color-status-success: #16a34a;
+  --color-status-warning: #d97706;
+  --color-status-error:   #dc2626;
+  --color-status-info:    var(--accent-600);
+
+  /* ---- Typography ---- */
+  --font-sans:    'Inter', 'Noto Sans TC', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ---- Spacing ---- */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---- Border Radius ---- */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* ---- Transitions ---- */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+}
+
+/* ---- Dark Mode Override ---- */
+[data-theme="dark"] {
+  --color-bg-base:    var(--neutral-900);
+  --color-bg-surface: var(--neutral-800);
+  --color-bg-overlay: var(--neutral-800);
+  --color-bg-subtle:  var(--neutral-700);
+
+  --color-text-primary:   var(--neutral-50);
+  --color-text-secondary: var(--neutral-400);
+  --color-text-muted:     var(--neutral-500);
+
+  --color-border-default: var(--neutral-700);
+  --color-border-strong:  var(--neutral-600);
+
+  --color-accent-primary: var(--accent-400);
+  --color-accent-hover:   var(--accent-500);
+  --color-accent-subtle:  rgb(59 130 246 / 0.15);
+}
