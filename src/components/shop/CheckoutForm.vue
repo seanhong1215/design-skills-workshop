@@ -49,14 +49,14 @@
       <label class="checkout-form__radio">
         <input v-model="form.paymentMethod" type="radio" value="credit" />
         <span class="checkout-form__radio-label">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <CreditCard :size="18" />
           信用卡 / 金融卡
         </span>
       </label>
       <label class="checkout-form__radio">
         <input v-model="form.paymentMethod" type="radio" value="atm" />
         <span class="checkout-form__radio-label">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <Building2 :size="18" />
           銀行轉帳（ATM）
         </span>
       </label>
@@ -65,6 +65,8 @@
 </template>
 
 <script setup>
+import { CreditCard, Building2 } from 'lucide-vue-next'
+
 defineProps({
   form: { type: Object, required: true },
   errors: { type: Object, default: () => ({}) }
@@ -131,6 +133,15 @@ defineProps({
 
 .checkout-form__input--error {
   border-color: var(--color-status-error);
+  animation: shake 400ms ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
 }
 
 .checkout-form__error {

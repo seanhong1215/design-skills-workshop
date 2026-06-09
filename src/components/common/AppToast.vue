@@ -21,8 +21,8 @@ const notificationStore = useNotificationStore()
 <style scoped>
 .toast-container {
   position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
+  top: 20px;
+  right: 20px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -60,18 +60,26 @@ const notificationStore = useNotificationStore()
   color: #fff;
 }
 
-.toast-enter-active,
+.toast-enter-active {
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
 .toast-leave-active {
-  transition: all var(--transition-normal);
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-12px);
+}
+
+.toast-enter-to {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-8px);
 }
 </style>

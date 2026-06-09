@@ -13,6 +13,16 @@ const routes = [
     component: () => import('@/views/AboutView.vue')
   },
   {
+    path: '/categories',
+    name: ROUTE_NAMES.CATEGORIES,
+    component: () => import('@/views/CategoriesView.vue')
+  },
+  {
+    path: '/wishlist',
+    name: ROUTE_NAMES.WISHLIST,
+    component: () => import('@/views/WishlistView.vue')
+  },
+  {
     path: '/products',
     name: ROUTE_NAMES.PRODUCT_LIST,
     component: () => import('@/views/ProductListView.vue')
@@ -30,7 +40,8 @@ const routes = [
   {
     path: '/checkout',
     name: ROUTE_NAMES.CHECKOUT,
-    component: () => import('@/views/CheckoutView.vue')
+    component: () => import('@/views/CheckoutView.vue'),
+    meta: { hideHeader: true }
   },
   {
     path: '/checkout/success',

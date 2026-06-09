@@ -1,16 +1,28 @@
 <template>
-  <main class="checkout">
-    <div class="checkout__inner">
-      <div class="checkout__header">
-        <div class="checkout__steps">
-          <span class="checkout__step checkout__step--done">● 訂購中</span>
-          <span class="checkout__step-sep">—</span>
-          <span class="checkout__step checkout__step--active">● 填寫</span>
-          <span class="checkout__step-sep">—</span>
-          <span class="checkout__step">○ 完成</span>
+  <div class="checkout-page">
+    <header class="checkout-header">
+      <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="checkout-header__logo">ShopLab</RouterLink>
+      <div class="checkout__steps">
+        <div class="step step--done">
+          <span class="step__dot"></span>
+          <span class="step__label">購物車</span>
+        </div>
+        <ChevronRight :size="14" class="step__arrow" />
+        <div class="step step--active">
+          <span class="step__dot"></span>
+          <span class="step__label">結帳</span>
+        </div>
+        <ChevronRight :size="14" class="step__arrow" />
+        <div class="step">
+          <span class="step__dot step__dot--empty"></span>
+          <span class="step__label">完成</span>
         </div>
       </div>
+    </header>
+    <main class="checkout">
+    <div class="checkout__inner">
 
+      <h1 class="checkout__page-title">填寫收件資訊</h1>
       <div class="checkout__content">
         <div class="checkout__form-col">
           <CheckoutForm :form="checkoutStore.form" :errors="checkoutStore.errors" />
@@ -20,11 +32,13 @@
             :disabled="checkoutStore.orderStatus === 'submitting' || cartStore.cartItems.length === 0"
             @click="handleSubmit"
           >
-            <span v-if="checkoutStore.orderStatus === 'submitting'" class="checkout__spinner">⟳</span>
-            {{ checkoutStore.orderStatus === 'submitting' ? '處理中...' : `確認付款 NT$${cartStore.total.toLocaleString()}` }}
+            <Loader2 v-if="checkoutStore.orderStatus === 'submitting'" :size="18" class="checkout__spinner" />
+            <template v-else>
+              <Lock :size="16" /> 確認付款 NT$ {{ cartStore.total.toLocaleString() }}
+            </template>
           </button>
           <p class="checkout__ssl-notice">
-            🔒 以 SSL 加密保護您的付款資訊，交易安全有保障
+            <Lock :size="12" /> 使用 SSL 加密傳輸，交易安全有保障
           </p>
         </div>
 
@@ -35,7 +49,7 @@
               <img :src="item.product.image" :alt="item.product.name" class="checkout__summary-img" />
               <div class="checkout__summary-item-info">
                 <p class="checkout__summary-item-name">{{ item.product.name }}</p>
-                <p class="checkout__summary-item-price">NT${{ item.product.price.toLocaleString() }} × {{ item.qty }}</p>
+                <p class="checkout__summary-item-price">NT$ {{ (item.product.price * item.qty).toLocaleString() }}</p>
               </div>
             </div>
           </div>
@@ -48,10 +62,12 @@
       </div>
     </div>
   </main>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
+import { Lock, ChevronRight, Loader2 } from 'lucide-vue-next'
 import { useCartStore } from '@/stores/cart.js'
 import { useCheckoutStore } from '@/stores/checkout.js'
 import { ROUTE_NAMES } from '@/constants/routes.js'
@@ -71,43 +87,82 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.checkout {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-6);
+.checkout-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-base);
 }
 
-.checkout__header {
+.checkout-header {
+  height: 60px;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-6);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.checkout-header__logo {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
 }
 
 .checkout__steps {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xs);
+  gap: var(--space-3);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.step__dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--color-accent-primary);
+  flex-shrink: 0;
+}
+
+.step__dot--empty {
+  background-color: #EEF0F2;
+}
+
+.step__label {
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.checkout__step {
-  font-size: var(--text-xs);
+.step--done .step__label {
+  color: var(--color-text-muted);
 }
 
-.checkout__step-sep {
-  color: var(--color-border-default);
-  font-size: var(--text-xs);
-}
-
-.checkout__step--done {
-  color: var(--color-status-success);
+.step--active .step__label {
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
-.checkout__step--active {
-  color: var(--color-accent-primary);
-  font-weight: 700;
+.step__arrow {
+  color: var(--color-border-default);
+  flex-shrink: 0;
+}
+
+.checkout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  flex: 1;
 }
 
 .checkout__content {
@@ -155,7 +210,6 @@ async function handleSubmit() {
 }
 
 .checkout__spinner {
-  display: inline-block;
   animation: spin 0.8s linear infinite;
 }
 
@@ -163,11 +217,22 @@ async function handleSubmit() {
   to { transform: rotate(360deg); }
 }
 
+.checkout__page-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6);
+}
+
 .checkout__ssl-notice {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   text-align: center;
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .checkout__order-summary {
@@ -218,8 +283,9 @@ async function handleSubmit() {
 }
 
 .checkout__summary-item-price {
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-price);
   margin: 0;
 }
 
@@ -234,5 +300,9 @@ async function handleSubmit() {
   font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-text-primary);
+}
+
+.checkout__summary-total span:last-child {
+  color: var(--color-price);
 }
 </style>

@@ -8,7 +8,7 @@
       <p class="product-card__category">{{ product.category }}</p>
       <h3 class="product-card__name">{{ product.name }}</h3>
       <div class="product-card__rating">
-        <span class="product-card__stars">★</span>
+        <Star :size="12" fill="currentColor" class="product-card__stars" />
         <span>{{ product.rating }}</span>
         <span class="product-card__review-count">({{ product.reviewCount }})</span>
       </div>
@@ -19,7 +19,7 @@
         </span>
       </div>
       <button v-if="showCartBtn" class="product-card__btn" @click.stop="$emit('add-to-cart', product)">
-        加入購物車
+        <ShoppingCart :size="14" /> 加入購物車
       </button>
     </div>
   </article>
@@ -27,6 +27,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { ShoppingCart, Star } from 'lucide-vue-next'
 
 const props = defineProps({
   product: { type: Object, required: true },
@@ -53,7 +54,7 @@ const discountPercent = computed(() => {
 
 .product-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .product-card__image-wrap {
@@ -67,11 +68,16 @@ const discountPercent = computed(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-normal);
+  transition: transform 300ms ease;
 }
 
 .product-card:hover .product-card__image {
-  transform: scale(1.04);
+  transform: scale(1.05);
+}
+
+.product-card__btn:active {
+  transform: scale(0.95);
+  transition: transform 100ms ease;
 }
 
 .product-card__badge {
@@ -121,6 +127,7 @@ const discountPercent = computed(() => {
 
 .product-card__stars {
   color: var(--color-rating);
+  flex-shrink: 0;
 }
 
 .product-card__review-count {
@@ -156,6 +163,11 @@ const discountPercent = computed(() => {
   font-weight: 600;
   cursor: pointer;
   transition: background-color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .product-card__btn:hover {

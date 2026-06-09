@@ -8,75 +8,55 @@
     <main class="payment-success">
       <div class="payment-success__inner">
         <div class="payment-success__check">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
+          <Check :size="32" stroke-width="2.5" />
         </div>
 
         <h1 class="payment-success__title">付款成功！</h1>
-        <p class="payment-success__subtitle">感謝您的訂購，我們將盡快為您處理。</p>
 
         <div class="payment-success__card">
-          <p class="payment-success__card-top">訂單已成功</p>
-          <p class="payment-success__label">訂單編號</p>
-          <p class="payment-success__order-id">{{ orderId }}</p>
-          <div class="payment-success__card-divider"></div>
+          <p class="payment-success__card-top">訂單已成立</p>
+          <div class="payment-success__order-row">
+            <span class="payment-success__order-label">訂單編號</span>
+            <span class="payment-success__order-id">{{ orderId }}</span>
+          </div>
           <div class="payment-success__card-row">
             <span>付款金額</span>
             <span class="payment-success__amount">NT$ {{ amount }}</span>
           </div>
+          <div class="payment-success__card-divider"></div>
           <p class="payment-success__email-notice">
-            親愛的朋友，確認信已發送到您的信箱，請注意查收。
+            <Mail :size="14" /> 確認信已寄至 user@example.com
           </p>
         </div>
 
         <div class="payment-success__actions">
           <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="payment-success__btn payment-success__btn--primary">
-            🛍 繼續購物
+            <ShoppingBag :size="16" /> 繼續購物
           </RouterLink>
           <RouterLink :to="{ name: ROUTE_NAMES.HOME }" class="payment-success__btn payment-success__btn--outline">
-            📋 查看訂單
+            <Receipt :size="16" /> 查看訂單
           </RouterLink>
         </div>
 
-        <p class="payment-success__countdown">
-          ⊙ {{ countdown }} 秒後自動返回首頁
-        </p>
+        <div class="payment-success__countdown">
+          <Clock :size="14" />
+          5 秒後自動返回首頁
+        </div>
+
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRoute, RouterLink, useRouter } from 'vue-router'
-import { useCheckoutStore } from '@/stores/checkout.js'
+import { ref } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
+import { Check, Mail, ShoppingBag, Receipt, Clock } from 'lucide-vue-next'
 import { ROUTE_NAMES } from '@/constants/routes.js'
 
 const route = useRoute()
-const router = useRouter()
-const checkoutStore = useCheckoutStore()
-
 const orderId = ref(route.query.orderId ?? `SL-${Date.now()}`)
 const amount = ref(route.query.amount ? Number(route.query.amount).toLocaleString() : '3,580')
-const countdown = ref(5)
-
-let timer = null
-
-onMounted(() => {
-  timer = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(timer)
-      checkoutStore.resetOrder()
-      router.push({ name: ROUTE_NAMES.HOME })
-    }
-  }, 1000)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
 </script>
 
 <style scoped>
@@ -145,18 +125,18 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: scaleIn 400ms ease forwards;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 .payment-success__title {
   font-size: var(--text-3xl);
   font-weight: 800;
   color: var(--color-text-primary);
-  margin: 0;
-}
-
-.payment-success__subtitle {
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -179,21 +159,23 @@ onUnmounted(() => {
   margin: 0;
 }
 
-.payment-success__label {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0;
+.payment-success__order-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.payment-success__order-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .payment-success__order-id {
   font-size: var(--text-base);
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0;
   font-family: var(--font-mono);
-  text-align: center;
 }
 
 .payment-success__card-divider {
@@ -217,6 +199,10 @@ onUnmounted(() => {
   color: var(--color-text-muted);
   margin: 0;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .payment-success__actions {
@@ -227,8 +213,11 @@ onUnmounted(() => {
 }
 
 .payment-success__btn {
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 14px 28px;
+  border-radius: 9999px;
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
@@ -255,6 +244,9 @@ onUnmounted(() => {
 }
 
 .payment-success__countdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   margin: 0;

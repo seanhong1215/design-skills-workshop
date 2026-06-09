@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 export const useCheckoutStore = defineStore('checkout', () => {
   const form = ref({
@@ -12,6 +12,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const orderStatus = ref('idle')
   const orderId = ref(null)
   const errors = ref({})
+
+  watch(() => form.value.name,    () => { if (errors.value.name)    errors.value = { ...errors.value, name: undefined } })
+  watch(() => form.value.phone,   () => { if (errors.value.phone)   errors.value = { ...errors.value, phone: undefined } })
+  watch(() => form.value.address, () => { if (errors.value.address) errors.value = { ...errors.value, address: undefined } })
 
   function validate() {
     const e = {}

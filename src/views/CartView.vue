@@ -3,9 +3,7 @@
     <div class="cart__inner">
       <div class="cart__header">
         <h1 class="cart__title">購物車</h1>
-        <RouterLink v-if="cartStore.cartItems.length > 0" :to="{ name: ROUTE_NAMES.CHECKOUT }" class="cart__instant-checkout">
-          立即結帳
-        </RouterLink>
+        <span v-if="cartStore.cartItems.length > 0" class="cart__item-count">{{ cartStore.itemCount }} 件商品</span>
       </div>
 
       <div v-if="cartStore.cartItems.length > 0" class="cart__content">
@@ -28,15 +26,11 @@
             </div>
             <div class="cart__summary-row">
               <span>運費</span>
-              <span class="cart__free-shipping">免運費</span>
+              <span class="cart__free-shipping">免費</span>
             </div>
             <div v-if="cartStore.discount > 0" class="cart__summary-row cart__summary-row--discount">
-              <span>折扣（滿NT$3,000）</span>
-              <span>−NT${{ cartStore.discount.toLocaleString() }}</span>
-            </div>
-            <div v-else class="cart__summary-row cart__summary-row--hint">
-              <span>距滿額折扣還差</span>
-              <span>NT${{ (3000 - cartStore.subtotal).toLocaleString() }}</span>
+              <span>折扣</span>
+              <span>– NT$ {{ cartStore.discount.toLocaleString() }}</span>
             </div>
           </div>
           <div class="cart__summary-total">
@@ -44,7 +38,7 @@
             <span>NT${{ cartStore.total.toLocaleString() }}</span>
           </div>
           <RouterLink :to="{ name: ROUTE_NAMES.CHECKOUT }" class="cart__checkout-btn">
-            前往結帳
+            🔒 前往結帳
           </RouterLink>
           <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="cart__continue-link">
             繼續購物
@@ -94,15 +88,9 @@ const cartStore = useCartStore()
   margin: 0;
 }
 
-.cart__instant-checkout {
+.cart__item-count {
   font-size: var(--text-sm);
-  color: var(--color-accent-primary);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.cart__instant-checkout:hover {
-  text-decoration: underline;
+  color: var(--color-text-muted);
 }
 
 .cart__content {
@@ -119,10 +107,9 @@ const cartStore = useCartStore()
 }
 
 .cart__items {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  padding: 0 var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .cart__summary {

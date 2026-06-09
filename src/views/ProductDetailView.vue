@@ -4,21 +4,23 @@
       <nav class="product-detail__breadcrumb">
         <RouterLink :to="{ name: ROUTE_NAMES.HOME }">首頁</RouterLink>
         <span>/</span>
-        <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }">商品列表</RouterLink>
+        <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }">商品</RouterLink>
         <span>/</span>
         <span>{{ product.name }}</span>
       </nav>
 
       <div class="product-detail__content">
         <div class="product-detail__gallery">
-          <img :src="product.image" :alt="product.name" class="product-detail__main-image" />
+          <img :src="activeImage" :alt="product.name" class="product-detail__main-image" />
           <div class="product-detail__thumbnails">
             <img
-              v-for="n in 3"
-              :key="n"
-              :src="`https://picsum.photos/seed/${product.id * 10 + n}/80/80`"
-              :alt="`${product.name} 圖片 ${n}`"
+              v-for="(img, i) in thumbnails"
+              :key="i"
+              :src="img"
+              :alt="`${product.name} 圖片 ${i + 1}`"
               class="product-detail__thumbnail"
+              :class="{ active: activeImage === img }"
+              @click="activeImage = img"
             />
           </div>
         </div>
@@ -28,7 +30,10 @@
           <h1 class="product-detail__name">{{ product.name }}</h1>
 
           <div class="product-detail__rating">
-            <span class="product-detail__stars">★ {{ product.rating }}</span>
+            <span class="product-detail__stars">
+              <Star :size="15" fill="currentColor" />
+              {{ product.rating }}
+            </span>
             <span class="product-detail__review-count">{{ product.reviewCount }} 則評價</span>
           </div>
 
@@ -51,7 +56,7 @@
           </div>
 
           <div class="product-detail__qty-row">
-            <label class="product-detail__qty-label">數量</label>
+            <label class="product-detail__qty-label">購買數量</label>
             <div class="product-detail__qty-ctrl">
               <button class="qty-btn" @click="qty > 1 && qty--" :disabled="qty <= 1">−</button>
               <span class="qty-num">{{ qty }}</span>
@@ -61,11 +66,11 @@
 
           <div class="product-detail__actions">
             <button class="product-detail__add-btn" :disabled="product.stock === 0" @click="handleAddToCart">
-              加入購物車
+              <ShoppingCart :size="18" /> 加入購物車
             </button>
-            <RouterLink :to="{ name: ROUTE_NAMES.CART }" class="product-detail__cart-link">
-              查看購物車 →
-            </RouterLink>
+            <button class="product-detail__wish-btn" :class="{ active: isWished }" @click="handleWish" aria-label="收藏">
+              <Heart :size="20" :fill="isWished ? '#ef4444' : 'none'" :color="isWished ? '#ef4444' : 'currentColor'" />
+            </button>
           </div>
         </div>
       </div>
@@ -78,26 +83,41 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { ShoppingCart, Heart, Star } from 'lucide-vue-next'
 import { useProductsStore } from '@/stores/products.js'
 import { useCartStore } from '@/stores/cart.js'
 import { useNotificationStore } from '@/stores/notification.js'
+import { useWishlistStore } from '@/stores/wishlist.js'
 import { ROUTE_NAMES } from '@/constants/routes.js'
 
 const route = useRoute()
 const productsStore = useProductsStore()
 const cartStore = useCartStore()
 const notificationStore = useNotificationStore()
+const wishlistStore = useWishlistStore()
 
 const qty = ref(1)
+const activeImage = ref('')
+
+const isWished = computed(() => product.value ? wishlistStore.isWished(product.value.id) : false)
+
+const product = computed(() => productsStore.currentProduct)
+
+const thumbnails = computed(() => {
+  if (!product.value) return []
+  return product.value.images ?? [product.value.image]
+})
+
+watch(product, (p) => {
+  if (p) activeImage.value = (p.images ?? [p.image])[0]
+}, { immediate: true })
 
 onMounted(() => {
   productsStore.loadProduct(route.params.id)
   qty.value = 1
 })
-
-const product = computed(() => productsStore.currentProduct)
 
 const discountPercent = computed(() => {
   if (!product.value?.originalPrice || product.value.originalPrice <= product.value.price) return 0
@@ -108,6 +128,16 @@ function handleAddToCart() {
   if (!product.value) return
   cartStore.addItem(product.value, qty.value)
   notificationStore.success(`「${product.value.name}」× ${qty.value} 已加入購物車`)
+}
+
+function handleWish() {
+  if (!product.value) return
+  const added = wishlistStore.toggle(product.value)
+  if (added) {
+    notificationStore.success(`「${product.value.name}」已加入收藏`)
+  } else {
+    notificationStore.info(`「${product.value.name}」已移除收藏`)
+  }
 }
 </script>
 
@@ -178,7 +208,8 @@ function handleAddToCart() {
   transition: border-color var(--transition-fast);
 }
 
-.product-detail__thumbnail:hover {
+.product-detail__thumbnail:hover,
+.product-detail__thumbnail.active {
   border-color: var(--color-accent-primary);
 }
 
@@ -204,6 +235,9 @@ function handleAddToCart() {
 }
 
 .product-detail__stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-rating);
   font-weight: 600;
 }
@@ -312,12 +346,12 @@ function handleAddToCart() {
 
 .product-detail__actions {
   display: flex;
-  flex-direction: column;
   gap: var(--space-3);
+  align-items: stretch;
 }
 
 .product-detail__add-btn {
-  width: 100%;
+  flex: 1;
   padding: var(--space-4);
   background-color: var(--color-accent-primary);
   color: #fff;
@@ -327,6 +361,10 @@ function handleAddToCart() {
   font-weight: 700;
   cursor: pointer;
   transition: background-color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .product-detail__add-btn:hover:not(:disabled) {
@@ -338,15 +376,22 @@ function handleAddToCart() {
   cursor: not-allowed;
 }
 
-.product-detail__cart-link {
-  text-align: center;
-  font-size: var(--text-sm);
-  color: var(--color-accent-primary);
-  text-decoration: none;
+.product-detail__wish-btn {
+  width: 52px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: none;
+  font-size: var(--text-xl);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
 }
 
-.product-detail__cart-link:hover {
-  text-decoration: underline;
+.product-detail__wish-btn:hover,
+.product-detail__wish-btn.active {
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .product-detail__not-found {

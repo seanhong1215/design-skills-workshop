@@ -2,23 +2,19 @@
   <main class="product-list">
     <div class="product-list__inner">
       <aside class="product-list__sidebar">
-        <h2 class="sidebar__title">商品篩選</h2>
+        <h2 class="sidebar__title">篩選條件</h2>
 
         <div class="sidebar-section">
           <h3 class="sidebar-section__title">商品分類</h3>
-          <ul class="sidebar-section__list">
-            <li v-for="cat in categories" :key="cat">
-              <button
-                class="sidebar-section__item"
-                :class="{ active: selectedCategory === cat }"
-                @click="selectCategory(cat)"
-              >
-                <span class="sidebar-section__radio" :class="{ active: selectedCategory === cat }"></span>
-                {{ cat }}
-                <span class="sidebar-section__count">{{ categoryCount(cat) }}</span>
-              </button>
-            </li>
-          </ul>
+          <div class="sidebar-section__pills">
+            <button
+              v-for="cat in categories"
+              :key="cat"
+              class="sidebar-pill"
+              :class="{ active: selectedCategory === cat }"
+              @click="selectCategory(cat)"
+            >{{ cat }}</button>
+          </div>
         </div>
 
         <div class="sidebar-section">
@@ -38,7 +34,7 @@
         <nav class="product-list__breadcrumb">
           <RouterLink :to="{ name: ROUTE_NAMES.HOME }">首頁</RouterLink>
           <span>/</span>
-          <span>產品清單</span>
+          <span>全部商品</span>
         </nav>
 
         <div class="product-list__head">
@@ -47,18 +43,18 @@
         </div>
 
         <div class="product-list__toolbar">
-          <p class="product-list__count">顯示全部，共 {{ filteredProducts.length }} 件商品</p>
+          <p class="product-list__count">共 {{ filteredProducts.length }} 件商品</p>
           <select v-model="sortBy" class="product-list__sort">
-            <option value="default">排序：精選</option>
+            <option value="default">排序：推薦</option>
             <option value="price-asc">價格：低到高</option>
             <option value="price-desc">價格：高到低</option>
             <option value="rating">評分最高</option>
           </select>
         </div>
 
-        <div v-if="pagedProducts.length > 0" class="product-list__grid">
+        <div v-if="filteredProducts.length > 0" class="product-list__grid">
           <ProductCard
-            v-for="product in pagedProducts"
+            v-for="product in filteredProducts"
             :key="product.id"
             :product="product"
             :showCartBtn="false"
@@ -69,21 +65,6 @@
           <p>沒有符合條件的商品</p>
           <button @click="resetFilters" class="product-list__reset-btn">清除篩選</button>
         </div>
-
-        <div v-if="totalPages > 1" class="product-list__pagination">
-          <button
-            v-for="p in totalPages"
-            :key="p"
-            class="pagination__btn"
-            :class="{ active: p === currentPage }"
-            @click="currentPage = p"
-          >{{ p }}</button>
-          <button
-            class="pagination__btn pagination__next"
-            :disabled="currentPage >= totalPages"
-            @click="currentPage++"
-          >下一頁 →</button>
-        </div>
       </section>
     </div>
   </main>
@@ -91,24 +72,20 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { useProductsStore } from '@/stores/products.js'
-import { useCartStore } from '@/stores/cart.js'
 import { categories } from '@/data/products.js'
 import { ROUTE_NAMES } from '@/constants/routes.js'
 import ProductCard from '@/components/shop/ProductCard.vue'
 
-const PAGE_SIZE = 8
-
 const router = useRouter()
 const route = useRoute()
 const productsStore = useProductsStore()
-const cartStore = useCartStore()
 
 const selectedCategory = ref('全部')
 const sortBy = ref('default')
 const priceMax = ref(15000)
-const currentPage = ref(1)
 
 onMounted(() => {
   productsStore.loadProducts()
@@ -128,20 +105,6 @@ const filteredProducts = computed(() => {
   if (sortBy.value === 'rating') return [...list].sort((a, b) => b.rating - a.rating)
   return list
 })
-
-const totalPages = computed(() => Math.ceil(filteredProducts.value.length / PAGE_SIZE))
-
-const pagedProducts = computed(() => {
-  const start = (currentPage.value - 1) * PAGE_SIZE
-  return filteredProducts.value.slice(start, start + PAGE_SIZE)
-})
-
-watch(filteredProducts, () => { currentPage.value = 1 })
-
-function categoryCount(cat) {
-  if (cat === '全部') return productsStore.products.length
-  return productsStore.products.filter(p => p.category === cat).length
-}
 
 function selectCategory(cat) {
   selectedCategory.value = cat
@@ -201,59 +164,34 @@ function goToProduct(id) {
   margin: 0 0 var(--space-3);
 }
 
-.sidebar-section__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.sidebar-section__pills {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
-.sidebar-section__item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-2);
-  border: none;
+.sidebar-pill {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
   background: none;
-  border-radius: var(--radius-sm);
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
   text-align: left;
+  transition: all var(--transition-fast);
 }
 
-.sidebar-section__item:hover {
-  color: var(--color-text-primary);
-}
-
-.sidebar-section__item.active {
-  color: var(--color-accent-primary);
-  font-weight: 600;
-}
-
-.sidebar-section__radio {
-  width: 14px;
-  height: 14px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-border-strong);
-  flex-shrink: 0;
-  transition: border-color var(--transition-fast);
-}
-
-.sidebar-section__radio.active {
+.sidebar-pill:hover {
   border-color: var(--color-accent-primary);
-  background-color: var(--color-accent-primary);
-  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+  color: var(--color-accent-primary);
 }
 
-.sidebar-section__count {
-  margin-left: auto;
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+.sidebar-pill.active {
+  background-color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: #fff;
+  font-weight: 600;
 }
 
 .sidebar-price {
@@ -342,8 +280,12 @@ function goToProduct(id) {
 
 .product-list__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-5);
+}
+
+@media (max-width: 900px) {
+  .product-list__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .product-list__empty {
@@ -363,46 +305,4 @@ function goToProduct(id) {
   cursor: pointer;
 }
 
-/* Pagination */
-.product-list__pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  justify-content: center;
-  margin-top: var(--space-8);
-}
-
-.pagination__btn {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-surface);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pagination__btn:hover:not(:disabled) {
-  border-color: var(--color-accent-primary);
-  color: var(--color-accent-primary);
-}
-
-.pagination__btn.active {
-  background-color: var(--color-accent-primary);
-  border-color: var(--color-accent-primary);
-  color: #fff;
-  font-weight: 700;
-}
-
-.pagination__btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.pagination__next {
-  padding: 0 var(--space-4);
-}
 </style>

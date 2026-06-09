@@ -2,11 +2,11 @@
   <div class="home-page">
     <main class="home">
       <section class="home__hero">
-        <span class="home__hero-badge">📦 全部精選 · 免費送達</span>
+        <span class="home__hero-badge">✦ 夏季特賣・全館最高 5 折</span>
         <h1 class="home__hero-title">探索你的下一件<br>心動好物</h1>
-        <p class="home__hero-subtitle">精選超過 1,000 件商品，快速訂購，輕鬆送貨</p>
+        <p class="home__hero-subtitle">精選超過 1,000 件商品，快速到府，輕鬆退換貨</p>
         <div class="home__hero-actions">
-          <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="home__btn home__btn--primary">立即領取</RouterLink>
+          <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="home__btn home__btn--primary">立即購物</RouterLink>
           <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="home__btn home__btn--outline">瀏覽分類</RouterLink>
         </div>
       </section>
@@ -30,11 +30,11 @@
     </main>
 
     <footer class="home__footer">
-      <p>© 2025 ShopLab. 所有商品最優惠，品質保證。</p>
+      <p>© 2026 ShopLab. 保留所有權利。</p>
       <div class="home__footer-links">
-        <a href="#">關於我們</a>
-        <a href="#">隱私政策</a>
-        <a href="#">服務條款</a>
+        <RouterLink :to="{ name: ROUTE_NAMES.ABOUT }">隱私政策</RouterLink>
+        <RouterLink :to="{ name: ROUTE_NAMES.ABOUT }">服務條款</RouterLink>
+        <RouterLink :to="{ name: ROUTE_NAMES.ABOUT }">聯絡我們</RouterLink>
       </div>
     </footer>
   </div>
