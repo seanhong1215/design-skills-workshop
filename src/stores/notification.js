@@ -15,5 +15,9 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications.value = notifications.value.filter(n => n.id !== id)
   }
 
-  return { notifications, push, remove }
+  const success = (msg) => push(msg, NOTIFICATION_TYPES.SUCCESS)
+  const error = (msg) => push(msg, NOTIFICATION_TYPES.ERROR)
+  const info = (msg) => push(msg, NOTIFICATION_TYPES.INFO)
+
+  return { notifications, push, remove, success, error, info }
 })

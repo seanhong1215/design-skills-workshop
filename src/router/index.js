@@ -13,6 +13,31 @@ const routes = [
     component: () => import('@/views/AboutView.vue')
   },
   {
+    path: '/products',
+    name: ROUTE_NAMES.PRODUCT_LIST,
+    component: () => import('@/views/ProductListView.vue')
+  },
+  {
+    path: '/products/:id',
+    name: ROUTE_NAMES.PRODUCT_DETAIL,
+    component: () => import('@/views/ProductDetailView.vue')
+  },
+  {
+    path: '/cart',
+    name: ROUTE_NAMES.CART,
+    component: () => import('@/views/CartView.vue')
+  },
+  {
+    path: '/checkout',
+    name: ROUTE_NAMES.CHECKOUT,
+    component: () => import('@/views/CheckoutView.vue')
+  },
+  {
+    path: '/checkout/success',
+    name: ROUTE_NAMES.PAYMENT_SUCCESS,
+    component: () => import('@/views/PaymentSuccessView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: ROUTE_NAMES.NOT_FOUND,
     component: () => import('@/views/NotFoundView.vue')

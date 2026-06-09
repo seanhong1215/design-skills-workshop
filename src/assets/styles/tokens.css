@@ -51,6 +51,17 @@
   --color-status-error:   #dc2626;
   --color-status-info:    var(--accent-600);
 
+  /* ---- E-Commerce: Promo & Price ---- */
+  --color-promo:          #e85d04;
+  --color-promo-subtle:   #fff3e0;
+  --color-price:          #1a56db;
+  --color-price-original: var(--neutral-400);
+  --color-rating:         #f59e0b;
+
+  /* ---- E-Commerce: Cart Badge ---- */
+  --color-badge-bg:   #e02424;
+  --color-badge-text: #ffffff;
+
   /* ---- Typography ---- */
   --font-sans:    'Inter', 'Noto Sans TC', ui-sans-serif, system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
