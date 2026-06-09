@@ -8,24 +8,16 @@
     <main class="result-main">
       <div class="result-inner">
 
-        <!-- 查詢中 -->
-        <template v-if="status === 'loading'">
-          <div class="result-icon result-icon--loading">
-            <Loader2 :size="36" class="result-spin" />
+        <!-- 付款成功（含驗證中） -->
+        <template v-if="status === 'success' || status === 'confirming'">
+          <div class="result-icon" :class="status === 'success' ? 'result-icon--success' : 'result-icon--confirming'">
+            <Check v-if="status === 'success'" :size="36" stroke-width="2.5" />
+            <Loader2 v-else :size="32" class="result-spin" />
           </div>
-          <h1 class="result-title">確認付款結果中...</h1>
-          <p class="result-desc">請稍候，正在向綠界確認交易狀態</p>
-        </template>
-
-        <!-- 付款成功 -->
-        <template v-else-if="status === 'success'">
-          <div class="result-icon result-icon--success">
-            <Check :size="36" stroke-width="2.5" />
-          </div>
-          <h1 class="result-title">付款成功！</h1>
+          <h1 class="result-title">{{ status === 'success' ? '付款成功！' : '訂單建立中...' }}</h1>
 
           <div class="result-card">
-            <p class="result-card__top">訂單已成立</p>
+            <p class="result-card__top">{{ status === 'success' ? '訂單已成立' : '正在確認交易狀態' }}</p>
             <div class="result-card__row result-card__row--center">
               <span class="result-card__label">訂單編號</span>
               <span class="result-card__id">{{ tradeNo }}</span>
@@ -42,7 +34,7 @@
             <p class="result-card__notice"><Mail :size="13" /> 確認信已寄至您的信箱</p>
           </div>
 
-          <div class="result-actions">
+          <div v-if="status === 'success'" class="result-actions">
             <RouterLink :to="{ name: ROUTE_NAMES.PRODUCT_LIST }" class="result-btn result-btn--primary">
               <ShoppingBag :size="16" /> 繼續購物
             </RouterLink>
@@ -102,7 +94,8 @@ const route = useRoute()
 const tradeNo = ref(route.query.tradeNo ?? '')
 const tradeAmt = ref(route.query.amount ?? '')
 const paymentDate = ref('')
-const status = ref('loading')   // 'loading' | 'success' | 'failed' | 'error'
+// confirming = 有訂單資訊但尚未 API 驗證；success = 已驗證；failed / error = 異常
+const status = ref('error')
 const statusMessage = ref('')
 const errorMessage = ref('')
 
@@ -134,18 +127,10 @@ function saveToCache(amt, date) {
   if (!key) return
   try {
     sessionStorage.setItem(key, JSON.stringify({ amt, date }))
-  } catch {
-    // sessionStorage 不可用時靜默忽略
-  }
+  } catch { /* 忽略 */ }
 }
 
-async function checkPayment(retryCount = 0) {
-  if (!tradeNo.value) {
-    status.value = 'error'
-    errorMessage.value = '缺少訂單編號，請從購物流程重新付款'
-    return
-  }
-
+async function verifyPayment(retryCount = 0) {
   try {
     const result = await queryPaymentResult(tradeNo.value)
 
@@ -159,28 +144,39 @@ async function checkPayment(retryCount = 0) {
       return
     }
 
-    // TradeStatus '0' = 尚未付款，可重試
     if (result.tradeStatus === '0' && retryCount < MAX_RETRY) {
       await new Promise(r => setTimeout(r, RETRY_DELAY))
-      return checkPayment(retryCount + 1)
+      return verifyPayment(retryCount + 1)
     }
 
-    // 其他狀態視為失敗
     statusMessage.value = result.tradeStatus === '10200095' ? '付款失敗' : `代碼 ${result.tradeStatus}`
     status.value = 'failed'
-  } catch (err) {
+  } catch {
     if (retryCount < MAX_RETRY) {
       await new Promise(r => setTimeout(r, RETRY_DELAY))
-      return checkPayment(retryCount + 1)
+      return verifyPayment(retryCount + 1)
     }
-    status.value = 'error'
-    errorMessage.value = '無法連線至付款查詢服務，請聯繫客服確認訂單狀態'
+    // 背景驗證失敗但已顯示 confirming，保守地降為 error
+    if (status.value === 'confirming') {
+      status.value = 'error'
+      errorMessage.value = '無法連線至付款查詢服務，請聯繫客服確認訂單狀態'
+    }
   }
 }
 
 onMounted(() => {
+  if (!tradeNo.value) {
+    status.value = 'error'
+    errorMessage.value = '缺少訂單編號，請從購物流程重新付款'
+    return
+  }
+
+  // 已快取（重複進入）→ 直接顯示成功，不重複動畫
   if (restoreFromCache()) return
-  checkPayment()
+
+  // 第一次從 ECPay 導回：立即顯示訂單資訊，背景驗證
+  status.value = 'confirming'
+  verifyPayment()
 })
 </script>
 
@@ -253,7 +249,7 @@ onMounted(() => {
   animation: scaleIn 400ms ease forwards;
 }
 
-.result-icon--loading {
+.result-icon--confirming {
   background-color: var(--color-bg-subtle);
   color: var(--color-accent-primary);
 }
