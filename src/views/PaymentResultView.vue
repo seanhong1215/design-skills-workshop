@@ -109,6 +109,36 @@ const errorMessage = ref('')
 const MAX_RETRY = 5
 const RETRY_DELAY = 2000
 
+function getCacheKey() {
+  return tradeNo.value ? `ecpay_paid_${tradeNo.value}` : null
+}
+
+function restoreFromCache() {
+  const key = getCacheKey()
+  if (!key) return false
+  try {
+    const cached = sessionStorage.getItem(key)
+    if (!cached) return false
+    const { amt, date } = JSON.parse(cached)
+    tradeAmt.value = amt
+    paymentDate.value = date
+    status.value = 'success'
+    return true
+  } catch {
+    return false
+  }
+}
+
+function saveToCache(amt, date) {
+  const key = getCacheKey()
+  if (!key) return
+  try {
+    sessionStorage.setItem(key, JSON.stringify({ amt, date }))
+  } catch {
+    // sessionStorage 不可用時靜默忽略
+  }
+}
+
 async function checkPayment(retryCount = 0) {
   if (!tradeNo.value) {
     status.value = 'error'
@@ -120,8 +150,11 @@ async function checkPayment(retryCount = 0) {
     const result = await queryPaymentResult(tradeNo.value)
 
     if (result.isPaid) {
-      tradeAmt.value = result.tradeAmt || tradeAmt.value
-      paymentDate.value = result.paymentDate || ''
+      const amt = result.tradeAmt || tradeAmt.value
+      const date = result.paymentDate || ''
+      tradeAmt.value = amt
+      paymentDate.value = date
+      saveToCache(amt, date)
       status.value = 'success'
       return
     }
@@ -145,7 +178,10 @@ async function checkPayment(retryCount = 0) {
   }
 }
 
-onMounted(checkPayment)
+onMounted(() => {
+  if (restoreFromCache()) return
+  checkPayment()
+})
 </script>
 
 <style scoped>

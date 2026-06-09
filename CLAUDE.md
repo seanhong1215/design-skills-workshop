@@ -51,6 +51,7 @@
 | `visual-design` | 視覺系統、色彩 token、排版、元件樣式 |
 | `engineering-spec` | 命名規範、資料夾結構、API 格式 |
 | `image-gen` | 生成 AI 圖片 prompt（Banner、Icon 等）|
+| `e2e-payment-test` | 綠界金流完整流程 E2E 測試（Playwright）|
 
 ## 設計文件
 
