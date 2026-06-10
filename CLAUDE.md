@@ -21,7 +21,9 @@
 | `src/constants/` | 常數、路由名稱、Enum 值 |
 | `src/utils/` | 純函式工具，無副作用 |
 | `src/assets/styles/` | Design tokens 與全域樣式 |
+| `server/` | Express 後端，ECPay 金流 API、dev/paid 模擬端點 |
 | `.claude/skills/` | Claude AI 技能腳本 |
+| `.docs/ec2-test/` | E2E 測試腳本、報告、截圖（產出物不進 git） |
 | `docs/design/` | 設計文件與規範 |
 
 ## 命名規範
@@ -60,8 +62,41 @@
 ## 開發指令
 
 ```bash
-npm run dev        # 啟動開發伺服器 (http://localhost:5173)
+npm run dev        # 啟動前端開發伺服器 (http://localhost:5173)
+npm run server     # 啟動後端伺服器 (http://localhost:3001)
+npm run dev:all    # 同時啟動前後端
 npm run build      # 生產建置
 npm run lint       # 修正 ESLint 問題
 npm run lint:check # 檢查 ESLint（不修正）
 ```
+
+## E2E 測試
+
+使用 Playwright 測試綠界金流完整流程，需先啟動前後端（`npm run dev:all`）。
+
+```bash
+npx playwright test --config=playwright.config.js
+```
+
+| 項目 | 說明 |
+|------|------|
+| 測試腳本 | `.docs/ec2-test/payment.spec.js` |
+| 設定檔 | `playwright.config.js`（slowMo 2s、錄影開啟） |
+| 測試報告 | `.docs/ec2-test/REPORT.md` |
+| 影片輸出 | `.docs/ec2-test/test-results/`（不進 git） |
+| 截圖輸出 | `.docs/ec2-test/screenshots/`（不進 git） |
+
+### 測試案例
+
+| 案例 | 說明 |
+|------|------|
+| 主流程 | 首頁 → 加購 → 結帳 → ECPay → 付款成功 |
+| 異常A | 空白表單送出 → 顯示 3 個欄位錯誤 |
+| 異常C | 無 tradeNo 直接訪問 `/payment/result` |
+| 異常D | 付款成功後繼續購物，購物車清空 |
+
+### 注意事項
+
+- 須設定 `.env` 含 `ECPAY_IS_STAGE=true` 及綠界測試憑證
+- `POST /api/ecpay/dev/paid/:tradeNo` 為本地模擬回調端點（僅 stage 模式有效）
+- WSL2 環境無法直接顯示瀏覽器，以錄影（`.webm`）替代視覺確認
