@@ -22,6 +22,7 @@
 | 環境設定 | `.env` 含有效的 `ECPAY_MERCHANT_ID`、`ECPAY_HASH_KEY`、`ECPAY_HASH_IV` |
 | 測試環境 | `ECPAY_IS_STAGE=true`（使用綠界測試環境） |
 | 瀏覽器 | Playwright MCP（Chromium） |
+| 本地觸發 | `POST /api/ecpay/dev/paid/:tradeNo` 取代 ngrok（僅限 stage 模式）|
 
 ### 綠界測試信用卡資料
 
@@ -75,18 +76,32 @@ curl -s http://localhost:3001/api/ecpay/return -X POST | grep -q "OK" && echo "B
 
 **2-6 完成 ECPay 測試付款**
 - 在綠界付款頁確認訂單金額正確
-- 選擇信用卡付款（若有選項）
-- 填入測試卡號：`4311952222222222`（無空格）
-- 填入有效期：`1226`
-- 填入安全碼：`222`
-- 點擊「確認付款」
-- 等待處理完成
+- 填入測試卡號欄位（id: CCpart1~CCpart4）：`4311` `9522` `2222` `2222`
+- 填入有效期（id: creditMM / creditYY）：`12` / `26`
+- 填入安全碼（id: CreditBackThree）：`222`
+- 點擊右側橘色「測試付款請點此」（id: `aCREDIT`）
+  - 此連結會在新分頁開啟 MockScanCodePay 模擬付款頁
+  - 切換至新分頁，確認卡號 `4311952222222222` 已帶入
+  - 點擊「交易成功」按鈕（`input[value="交易成功"]`）
+  - 新分頁關閉後記錄 tradeNo（從 ECPay 頁面訂單資訊取得）
+
+**2-6b 本地觸發付款成功（方案B — 取代 ngrok）**
+
+> ECPay 無法 POST 至 `localhost:3001`，使用後端 dev 端點在本機模擬 ReturnURL 回調
+
+```bash
+# 將 {tradeNo} 替換為實際訂單編號（如 SL1781062707199），{amount} 替換為金額
+curl -s -X POST "http://localhost:3001/api/ecpay/dev/paid/{tradeNo}?amount={amount}"
+```
+
+- 確認回應：`{"ok":true,"tradeNo":"SL...","tradeAmt":"...","paymentDate":"..."}`
+- 此端點僅在 `ECPAY_IS_STAGE=true` 時有效，正式環境會回傳 403
 
 **2-7 驗證付款結果頁**
-- 確認導回 URL 含 `/payment/result?tradeNo=SL...&amount=...`
-- 確認頁面進入 loading 狀態（「確認付款結果中...」）
-- 等待輪詢完成（最多 10 秒）
-- **關鍵驗證：** 確認顯示「付款成功！」並含訂單編號
+- 導航至 `http://localhost:5173/payment/result?tradeNo={tradeNo}&amount={amount}`
+- 確認頁面進入 `confirming` 狀態（Loader2 spinner + 「訂單建立中...」）
+- 等待輪詢完成（最多 10 秒，每 2 秒一次，共 5 次）
+- **關鍵驗證：** 確認顯示「付款成功！」並含訂單編號與金額
 - **關鍵驗證：** 確認頁面不會再次導向或重複觸發任何成功動作
 - 截圖記錄最終狀態
 
@@ -133,36 +148,6 @@ curl -s http://localhost:3001/api/ecpay/return -X POST | grep -q "OK" && echo "B
 
 ---
 
-## 已知問題排查（執行前先讀）
-
-### 問題：付款成功後「又跑一次付款成功」
-
-**可能原因分析：**
-
-1. **`checkoutStore.orderStatus` 殘留 `'success'`**
-   - 舊版 `submitOrder()` 會將 `orderStatus` 設為 `'success'`
-   - 若有任何元件 `watch(() => checkoutStore.orderStatus)` 在 `'success'` 時導向成功頁，就會重複觸發
-   - 修正方向：確認 `checkout.js` 的 `submitOrder()` 不被新流程呼叫；或在 `PaymentResultView` 載入時呼叫 `checkoutStore.resetOrder()`
-
-2. **`PaymentSuccessView` 路由守衛**
-   - 確認 `/checkout/success` 沒有 navigation guard 會在特定狀態下自動導向
-
-3. **Pinia store 跨頁面持久化**
-   - Pinia 預設 store 狀態在頁面重整後會重置，但 SPA 路由切換後狀態保留
-   - 確認 `orderStatus` 在 `PaymentResultView` 進入時被 reset
-
-**立即修正步驟（若確認為 orderStatus 殘留）：**
-```javascript
-// PaymentResultView.vue — onMounted 中加入
-import { useCheckoutStore } from '@/stores/checkout.js'
-const checkoutStore = useCheckoutStore()
-onMounted(() => {
-  checkoutStore.resetOrder()  // 清除結帳狀態，防止殘留
-  checkPayment()
-})
-```
-
----
 
 ## Playwright MCP 指令參考
 

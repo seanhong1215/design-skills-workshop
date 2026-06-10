@@ -38,3 +38,10 @@ yarn-error.log*
 
 # Local scripts
 scripts
+
+# Local Test
+.playwright-mcp
+test-results/
+.docs/ec2-test/test-results/
+.docs/ec2-test/screenshots/
+.docs/ec2-test/results.json
